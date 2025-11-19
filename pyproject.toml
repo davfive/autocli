@@ -31,10 +31,6 @@ testing = [
     "pytest-cov"
 ]
 
-[tool.setuptools]
-# Explicitly control license file detection
-license-files = ["LICENSE"]
-
 [tool.setuptools_scm]
 write_to = "src/autocli/_version.py"
 
