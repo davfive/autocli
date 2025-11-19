@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "wheel", "setuptools-scm[toml]>=6.2"]
+requires = ["setuptools>=77.0.0", "wheel", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,8 @@ description = "A dynamic argparse command loader for modular CLIs using __ separ
 readme = "README.md"
 authors = [{name = "davfive", email = "davfive@gmail.com"}]
 license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.8"
 keywords = ["cli", "argparse", "subcommands", "dynamic", "autocli"]
 classifiers = [
@@ -29,6 +31,10 @@ testing = [
     "pytest>=7.0.0",
     "pytest-cov"
 ]
+
+[tool.setuptools]
+# Explicitly control license file detection
+license-files = ["LICENSE"]
 
 [tool.setuptools_scm]
 write_to = "src/autocli/_version.py"
