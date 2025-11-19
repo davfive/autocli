@@ -21,8 +21,13 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - name: Checkout
+    - name: Checkout (full history for setuptools-scm)
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Ensure repository is unshallowed (fallback)
+      run: git fetch --prune --unshallow --tags || true
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -64,6 +69,7 @@ jobs:
 
       - name: Build distributions
         run: python -m build --verbose
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -76,8 +82,10 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout
+      - name: Checkout (full history)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -114,8 +122,10 @@ jobs:
       name: DeployGate_PyPiTest
 
     steps:
-      - name: Checkout
+      - name: Checkout (full history)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -138,8 +148,10 @@ jobs:
       name: DeployGate_PyPiProd
 
     steps:
-      - name: Checkout
+      - name: Checkout (full history)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
