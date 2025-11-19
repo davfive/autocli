@@ -7,7 +7,7 @@ name = "autocli"
 description = "A dynamic argparse command loader for modular CLIs using __ separation."
 readme = "README.md"
 authors = [{name = "davfive", email = "davfive@gmail.com"}]
-license = { text = "MIT" }
+license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.8"
 keywords = ["cli", "argparse", "subcommands", "dynamic", "autocli"]
