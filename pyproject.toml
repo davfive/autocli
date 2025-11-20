@@ -1,43 +1,62 @@
 [build-system]
-requires = ["setuptools>=77.0.0", "wheel", "setuptools-scm[toml]>=6.2"]
+requires = ["setuptools>=61.0.0", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "autocli"
 description = "A dynamic argparse command loader for modular CLIs using __ separation."
 readme = "README.md"
-authors = [{name = "davfive", email = "davfive@gmail.com"}]
-license = "MIT"
-license-files = ["LICENSE"]
 requires-python = ">=3.8"
-keywords = ["cli", "argparse", "subcommands", "dynamic", "autocli"]
+license = {text = "MIT"}
+authors = [
+    {name = "davfive", email = "davfive@gmail.com"}
+]
+keywords = [
+    "cli",
+    "argparse",
+    "subcommands",
+    "dynamic",
+    "autocli"
+]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules"
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 testing = [
     "pytest>=7.0.0",
-    "pytest-cov"
+    "pytest-cov>=4.0.0"
 ]
 
-[tool.setuptools_scm]
-write_to = "src/autocli/_version.py"
+[project.urls]
+Homepage = "https://github.com/davfive/autocli"
+Repository = "https://github.com/davfive/autocli"
+Issues = "https://github.com/davfive/autocli/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools_scm]
+write_to = "src/autocli/_version.py"
+
 [tool.pytest.ini_options]
 python_files = "test_*.py"
-testpaths = "tests"
+testpaths = ["tests"]
 xfail_strict = true
 addopts = "--cov=autocli --cov-report=term-missing --strict-markers"
