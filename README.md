@@ -4,18 +4,23 @@
 [![Python Support](https://img.shields.io/pypi/pyversions/autocli.svg)](https://pypi.org/project/autocli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**A dynamic argparse command loader for modular CLIs using `__` separation.**
+A dynamic argparse command loader for building modular CLIs.
 
-autocli simplifies building complex command-line interfaces by automatically discovering and organizing subcommands from your Python modules. Define commands as simple Python files, and autocli handles the argparse boilerplate.
+autocli automatically discovers and registers subcommands from your Python modules, eliminating the need for manual argparse subparser registration. Organize your commands using directory hierarchies, double-underscore (`__`) filename separation, or a mix of both.
 
-## Features
+## Why autocli?
 
-- 🚀 **Zero Boilerplate**: No manual subparser registration needed
-- 📁 **Flexible Organization**: Support for both directory hierarchies and `__` filename separation
-- 🔄 **Mixed Patterns**: Combine directories and `__` separators in the same project
-- 🎯 **Simple API**: Just two required functions per command module
-- 🧩 **Modular Design**: Easy to add, remove, or reorganize commands
-- ⚡ **Automatic Discovery**: Commands are discovered recursively from your package
+If you're building a CLI with multiple subcommands, you've probably written code like this dozens of times:
+
+```python
+subparsers = parser.add_subparsers()
+user_parser = subparsers.add_parser('user')
+user_subparsers = user_parser.add_subparsers()
+add_parser = user_subparsers.add_parser('add')
+# ... and so on
+```
+
+autocli eliminates this boilerplate. Drop your command files into a directory structure, and they're automatically registered. Each command needs just two functions: one to configure its arguments, and one to execute.
 
 ## Installation
 
@@ -91,10 +96,7 @@ from autocli import create_command_parser
 import commands
 
 def main():
-    parser = create_command_parser(
-        commands,
-        description="My awesome CLI application"
-    )
+    parser = create_command_parser(commands, description="My CLI tool")
     args = parser.parse_args()
     
     if hasattr(args, "func"):
@@ -121,12 +123,11 @@ positional arguments:
     add       Add a new user
 ```
 
-## Command Organization Patterns
+## Command Organization
 
-### Directory Hierarchy
+You have three options for organizing commands:
 
-Best for larger projects with many related commands:
-
+**Directory hierarchy** - Good for larger projects:
 ```
 commands/
 ├── user/
@@ -137,10 +138,7 @@ commands/
         └── config.py → admin settings config
 ```
 
-### Dunder (`__`) Separation
-
-Best for flatter structures or when you prefer single-file commands:
-
+**Filename separation with `__`** - Good for flatter structures:
 ```
 commands/
 ├── user__add.py      → user add
@@ -148,10 +146,7 @@ commands/
 └── admin__config.py  → admin config
 ```
 
-### Mixed Approach
-
-Combine both patterns for maximum flexibility:
-
+**Mixed approach** - Use both:
 ```
 commands/
 ├── user__db/
@@ -163,15 +158,14 @@ commands/
 
 ## Examples
 
-The repository includes several complete examples demonstrating different organizational patterns:
+The `examples/` directory contains working examples:
 
-- **[single_app](examples/single_app/)**: Simple single-level commands
-- **[dunder_app](examples/dunder_app/)**: Using `__` filename separation
-- **[dirs_app](examples/dirs_app/)**: Directory-based hierarchy
-- **[mixed_app](examples/mixed_app/)**: Combining both approaches
+- `single_app/` - Simple single-level commands
+- `dunder_app/` - Using `__` filename separation
+- `dirs_app/` - Directory-based hierarchy
+- `mixed_app/` - Combining both approaches
 
-Run any example:
-
+Try them out:
 ```bash
 cd examples/dunder_app
 python run.py --help
@@ -179,32 +173,24 @@ python run.py --help
 
 ## Requirements
 
-- Python 3.8 or higher
-- No external dependencies (uses only standard library)
+Python 3.8+ with no external dependencies.
 
-## Documentation
+## Development
 
-For more detailed information, see:
+Run tests:
+```bash
+pip install -e ".[testing]"
+pytest
+```
 
-- [Testing Guide](tests/README.md)
-- [Deployment Workflow](README.deploy.md)
-- [PyPI Testing](README.testing-pypi.md)
-- [GitHub Testing](README.testing-github.md)
+See [tests/README.md](tests/README.md) for details.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests welcome. For major changes, open an issue first.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
-## Author
-
-**davfive** - [davfive@gmail.com](mailto:davfive@gmail.com)
-
-## Links
-
-- [PyPI Package](https://pypi.org/project/autocli/)
-- [Source Code](https://github.com/davfive/autocli)
-- [Issue Tracker](https://github.com/davfive/autocli/issues)
+Copyright (c) 2025 davfive ([davfive@gmail.com](mailto:davfive@gmail.com))
