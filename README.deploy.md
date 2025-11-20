@@ -12,15 +12,15 @@ The manual approval gates only work if you configure GitHub Environments in your
 
 The workflow runs four sequential jobs:
 
-1. **build** - Builds wheel and source distributions using `python -m build`
-2. **deploy_github_packages** - Publishes to GitHub Packages (automatic backup)
-3. **deploy_pypi_test** - Deploys to TestPyPI (requires approval at `DeployGate_PyPiTest`)
-4. **deploy_pypi_prod** - Deploys to PyPI (requires approval at `DeployGate_PyPiProd`)
+1. **test** - Runs tests on Python 3.8-3.13
+2. **build** - Builds wheel and source distributions using `python -m build`
+3. **publish-to-testpypi** - Deploys to TestPyPI (requires approval at `DeployGate_PyPiTest`)
+4. **publish-to-pypi** - Deploys to PyPI (requires approval at `DeployGate_PyPiProd`)
 
 ## Deployment Process
 
 1. Tag a release: `git tag v0.1.0 && git push --tags`
-2. Workflow builds package and deploys to GitHub Packages
+2. Workflow runs tests and builds package
 3. Approve `DeployGate_PyPiTest` to deploy to TestPyPI
 4. Test the TestPyPI release:
    ```bash

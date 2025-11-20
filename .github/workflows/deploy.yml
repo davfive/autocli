@@ -1,14 +1,12 @@
-name: Python Package Deployment
-run-name: Release ${{ github.ref_name }} to PyPI and GitHub Packages
+name: Publish Python Package
 
 on:
   push:
     tags:
-      - 'v*' # Trigger on any tag starting with 'v' (e.g., v0.1.0)
+      - 'v*'
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   test:
@@ -17,78 +15,66 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - name: Checkout (full history for setuptools-scm)
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Ensure repository is unshallowed (fallback)
-      run: git fetch --prune --unshallow --tags || true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[testing]"
 
-    - name: Install dependencies (including testing extras)
-      run: pip install .[testing]
-
-    - name: Run Pytest and Coverage
-      run: python -m pytest --cov --cov-report=xml
-
-    - name: Upload Coverage Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ github.event.repository.name }}-${{ github.ref_name }}-coverage-report-python-${{ matrix.python-version }}
-        path: coverage.xml
-        if-no-files-found: ignore
-
+      - name: Run tests
+        run: pytest
 
   build:
-    name: Build Package Distributions
+    name: Build distribution
     runs-on: ubuntu-latest
     needs: test
 
     steps:
-      - name: Checkout (full history for setuptools-scm)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python (build)
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
-      - name: Install build dependencies (ensure modern tooling)
-        run: python -m pip install --upgrade pip setuptools wheel build setuptools-scm packaging
+      - name: Install build dependencies
+        run: python -m pip install --upgrade build
 
-      - name: Build distributions
-        run: python -m build --verbose
+      - name: Build distribution
+        run: python -m build
 
-      - name: Upload Artifacts
+      - name: Store distribution packages
         uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
-  deploy_pypi_test:
-    name: Deploy to TestPyPI (Gated)
+  publish-to-testpypi:
+    name: Publish to TestPyPI
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: DeployGate_PyPiTest
+      url: https://test.pypi.org/p/autocli
+
+    permissions:
+      id-token: write
 
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Artifacts
+      - name: Download distribution packages
         uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
@@ -99,29 +85,26 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          attestations: false
 
-  deploy_pypi_prod:
-    name: Deploy to PyPI Production (Gated)
+  publish-to-pypi:
+    name: Publish to PyPI
     runs-on: ubuntu-latest
-    needs: deploy_pypi_test
+    needs: publish-to-testpypi
     environment:
       name: DeployGate_PyPiProd
+      url: https://pypi.org/p/autocli
+
+    permissions:
+      id-token: write
 
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Artifacts
+      - name: Download distribution packages
         uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
-      - name: Publish to PyPI (Production)
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
-          attestations: false
